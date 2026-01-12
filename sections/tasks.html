@@ -1,0 +1,65 @@
+<section id="section-tasks" class="view-section">
+    <div class="control-panel">
+        <div class="input-group">
+            <!-- User Selection -->
+            <div>
+                <label>Operator:</label>
+                <select id="user-select" onchange="app.renderTasks()">
+                    <!-- Options populated by JS -->
+                </select>
+                <button class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;" onclick="userManager.openModal()">+ Add User</button>
+            </div>
+
+            <!-- Date Picker -->
+            <div>
+                <label>Date:</label>
+                <input type="date" id="report-date" onchange="app.renderTasks()">
+            </div>
+        </div>
+
+        <div class="shift-tabs">
+            <button class="shift-tab active" onclick="app.setShift('A')">Shift A</button>
+            <button class="shift-tab" onclick="app.setShift('B')">Shift B</button>
+            <button class="shift-tab" onclick="app.setShift('C')">Shift C</button>
+            <button class="shift-tab" onclick="app.setShift('G')">Shift G</button>
+        </div>
+        
+        <!-- Cloud Status -->
+        <div class="cloud-status">
+            <span class="cloud-indicator" id="cloud-status-indicator"></span>
+            <span id="cloud-status-text">Checking connection...</span>
+            <button class="btn btn-sm btn-success" onclick="syncManager.forceSync()" style="margin-left: auto; padding: 0.25rem 0.75rem;">Sync Now</button>
+        </div>
+    </div>
+
+    <div class="task-container">
+        <div class="progress-area">
+            <div class="progress-label">
+                <span>Daily Progress</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <ul class="task-list" id="task-list-ui">
+            <!-- Tasks injected here -->
+        </ul>
+
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="editor.openModal()">Edit Task List</button>
+                <button class="btn btn-primary" onclick="app.submitTasks()">Submit Daily Report</button>
+            </div>
+            
+            <!-- Sync Controls -->
+            <div class="sync-controls">
+                <button class="btn btn-sm btn-success" onclick="syncManager.saveToCloud()">Save to Cloud</button>
+                <button class="btn btn-sm btn-warning" onclick="syncManager.loadFromCloud()">Load from Cloud</button>
+                <button class="btn btn-sm btn-danger" onclick="syncManager.clearLocalData()">Clear Local Data</button>
+                <button class="btn btn-sm btn-secondary" onclick="syncManager.openModal()">Sync Status</button>
+            </div>
+        </div>
+    </div>
+</section>

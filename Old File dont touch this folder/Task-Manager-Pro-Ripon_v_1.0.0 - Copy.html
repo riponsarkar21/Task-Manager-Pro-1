@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Task Manager Pro - Cloud Sync</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 8px;
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh;
+            display: flex; 
+            flex-direction: column;
+            padding-top: var(--safe-area-top);
+            padding-bottom: var(--safe-area-bottom);
+        }
+
+        /* --- Header --- */
+        header {
+            background: var(--card-bg); 
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: var(--shadow); 
+            z-index: 10;
+            position: sticky;
+            top: 0;
+        }
+        
+        .brand { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            color: var(--primary); 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        
+        .nav-btn {
+            background: transparent; 
+            border: none; 
+            padding: 0.5rem 0.75rem; 
+            cursor: pointer; 
+            font-weight: 600;
+            color: var(--secondary); 
+            border-radius: 6px; 
+            transition: 0.2s;
+            font-size: 0.95rem;
+            min-height: 40px;
+            min-width: 44px;
+        }
+        
+        .nav-btn.active { 
+            background-color: var(--primary); 
+            color: white; 
+        }
+        
+        .nav-btn:hover:not(.active) { 
+            background-color: var(--bg); 
+            color: var(--primary); 
+        }
+
+        /* --- Main Layout --- */
+        main { 
+            flex: 1; 
+            padding: 1rem; 
+            max-width: 1200px; 
+            width: 100%; 
+            margin: 0 auto; 
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding: 0.75rem;
+            }
+        }
+        
+        .view-section { 
+            display: none; 
+            animation: fadeIn 0.3s ease-in-out; 
+        }
+        
+        .view-section.active { 
+            display: block; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* --- Inputs & Controls --- */
+        .control-panel { 
+            background: var(--card-bg); 
+            padding: 1.25rem; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 1.5rem; 
+        }
+        
+        @media (max-width: 768px) {
+            .control-panel {
+                padding: 1rem;
+            }
+        }
+        
+        .input-group { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 1rem; 
+            align-items: center; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        @media (max-width: 640px) {
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+        }
+        
+        label { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            color: var(--secondary); 
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        select, input[type="text"], input[type="date"] {
+            padding: 0.75rem 1rem; 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius); 
+            font-size: 1rem;
+            background: white; 
+            outline: none;
+            width: 100%;
+        }
+        
+        select:focus, input:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+        
+        /* --- Buttons --- */
+        .btn { 
+            padding: 0.75rem 1.5rem; 
+            border: none; 
+            border-radius: var(--radius); 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            font-size: 1rem; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 6px; 
+            min-height: 44px;
+            width: 100%;
+        }
+        
+        @media (min-width: 640px) {
+            .btn {
+                width: auto;
+            }
+        }
+        
+        .btn-primary { 
+            background: var(--primary); 
+            color: white; 
+        }
+        
+        .btn-primary:hover { 
+            background: var(--primary-dark); 
+        }
+        
+        .btn-secondary { 
+            background: white; 
+            border: 1px solid var(--border); 
+            color: var(--text); 
+        }
+        
+        .btn-secondary:hover { 
+            background: var(--bg); 
+        }
+        
+        .btn-danger { 
+            background: var(--danger); 
+            color: white; 
+        }
+        
+        .btn-success { 
+            background: var(--success); 
+            color: white; 
+        }
+        
+        .btn-warning { 
+            background: var(--warning); 
+            color: white; 
+        }
+        
+        .btn-sm { 
+            padding: 0.5rem 1rem; 
+            font-size: 0.9rem; 
+            min-height: 36px;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+        }
+        
+        @media (min-width: 640px) {
+            .button-group {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        /* --- Cloud Status --- */
+        .cloud-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            background: var(--bg);
+            border-radius: var(--radius);
+            margin-top: 0.5rem;
+        }
+        
+        .cloud-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .cloud-indicator.online {
+            background-color: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        .cloud-indicator.offline {
+            background-color: var(--secondary);
+        }
+        
+        .cloud-indicator.syncing {
+            background-color: var(--warning);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* --- Shift Tabs --- */
+        .shift-tabs { 
+            display: flex; 
+            gap: 0.25rem; 
+            margin-bottom: 1.5rem; 
+            background: var(--bg); 
+            padding: 0.25rem; 
+            border-radius: 8px; 
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .shift-tab { 
+            padding: 0.75rem 1rem; 
+            border: none; 
+            background: transparent; 
+            cursor: pointer; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            color: var(--secondary); 
+            transition: 0.2s;
+            font-size: 0.95rem;
+            flex: 1;
+            min-width: 60px;
+            min-height: 44px;
+            white-space: nowrap;
+        }
+        
+        .shift-tab.active { 
+            background: white; 
+            color: var(--primary); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        }
+
+        /* --- Task List --- */
+        .task-container { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            padding: 1.5rem;
+            min-height: 300px; 
+        }
+        
+        @media (max-width: 768px) {
+            .task-container {
+                padding: 1.25rem;
+            }
+        }
+        
+        .progress-area { 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .progress-label { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 0.5rem; 
+            font-weight: 600; 
+        }
+        
+        .progress-track { 
+            height: 12px; 
+            background: var(--bg); 
+            border-radius: 6px; 
+            overflow: hidden; 
+        }
+        
+        .progress-fill { 
+            height: 100%; 
+            background: var(--primary); 
+            width: 0%; 
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        
+        .task-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 0.75rem; 
+        }
+        
+        @media (min-width: 640px) {
+            .task-list {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+        
+        .task-item { 
+            display: flex; 
+            align-items: flex-start; 
+            padding: 1rem; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            transition: 0.2s; 
+            cursor: pointer;
+            min-height: 60px;
+        }
+        
+        .task-item:hover { 
+            border-color: var(--primary); 
+            background-color: #f8fafc; 
+        }
+        
+        .task-item input[type="checkbox"] { 
+            width: 1.5rem; 
+            height: 1.5rem; 
+            margin-right: 1rem; 
+            margin-top: 0.125rem;
+            cursor: pointer; 
+            accent-color: var(--primary); 
+            flex-shrink: 0;
+        }
+        
+        .task-item.checked .task-text { 
+            text-decoration: line-through; 
+            color: var(--secondary); 
+        }
+        
+        .task-item.unchecked { 
+            background-color: #fff1f2; 
+            border-color: #fecaca; 
+        }
+        
+        .task-item.unchecked .task-text { 
+            color: var(--text); 
+            font-weight: 500; 
+        }
+
+        /* --- Dashboard --- */
+        .dashboard-controls { 
+            background: white; 
+            padding: 1rem; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow); 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .dashboard-controls {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .control-left-group { 
+            display: flex; 
+            flex-direction: column;
+            gap: 1rem; 
+            align-items: stretch; 
+            width: 100%;
+        }
+        
+        @media (min-width: 640px) {
+            .control-left-group {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .view-toggles { 
+            display: flex; 
+            gap: 0.25rem; 
+            background: var(--bg); 
+            padding: 4px; 
+            border-radius: 6px; 
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .view-btn { 
+            padding: 0.6rem 0.75rem; 
+            border: none; 
+            background: transparent; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-weight: 600; 
+            color: var(--secondary); 
+            font-size: 0.9rem; 
+            flex: 1;
+            min-width: 70px;
+            min-height: 40px;
+            white-space: nowrap;
+        }
+        
+        .view-btn.active { 
+            background: white; 
+            color: var(--primary); 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); 
+        }
+        
+        .custom-range-inputs { 
+            display: flex; 
+            flex-direction: column;
+            gap: 0.75rem; 
+            width: 100%;
+        }
+        
+        @media (min-width: 640px) {
+            .custom-range-inputs {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+        
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 1rem; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        @media (min-width: 640px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+        }
+        
+        .stat-card { 
+            background: white; 
+            padding: 1.25rem; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--border); 
+        }
+        
+        .stat-title { 
+            font-size: 0.9rem; 
+            color: var(--secondary); 
+            margin-bottom: 0.5rem; 
+        }
+        
+        .stat-value { 
+            font-size: 1.75rem; 
+            font-weight: 700; 
+            color: var(--text); 
+        }
+        
+        .chart-wrapper { 
+            height: 200px; 
+            display: flex; 
+            align-items: flex-end; 
+            justify-content: space-around; 
+            padding: 1rem 0; 
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .bar-group { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-width: 40px;
+            height: 100%; 
+            justify-content: flex-end; 
+            flex-shrink: 0;
+        }
+        
+        .bar { 
+            width: 30px; 
+            background: var(--primary); 
+            border-radius: 4px 4px 0 0; 
+            transition: height 0.5s ease; 
+            min-height: 4px; 
+            position: relative; 
+        }
+        
+        .bar:hover::after { 
+            content: attr(data-val); 
+            position: absolute; 
+            top: -25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #333; 
+            color: white; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-size: 0.75rem; 
+            white-space: nowrap; 
+        }
+        
+        .bar-label { 
+            margin-top: 0.5rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            text-align: center; 
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.9rem; 
+            overflow-x: auto;
+            display: block;
+        }
+        
+        .log-table th, .log-table td { 
+            text-align: left; 
+            padding: 0.75rem; 
+            border-bottom: 1px solid var(--border); 
+            white-space: nowrap;
+        }
+        
+        .log-table th { 
+            background: var(--bg); 
+            font-weight: 600; 
+            cursor: pointer; 
+            user-select: none; 
+            transition: background 0.2s;
+            position: sticky;
+            top: 0;
+        }
+        
+        .log-table th:hover { 
+            background: #e2e8f0; 
+        }
+        
+        .sort-icon { 
+            margin-left: 5px; 
+            font-size: 0.8rem; 
+            color: var(--secondary); 
+        }
+
+        /* --- Modals --- */
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 100; 
+            opacity: 0; 
+            transition: opacity 0.3s;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        
+        .modal-overlay.open { 
+            display: flex; 
+            opacity: 1; 
+        }
+        
+        .modal-window { 
+            background: white; 
+            width: 100%;
+            max-width: 600px; 
+            border-radius: 12px; 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column; 
+            max-height: 90vh; 
+            transform: scale(0.95); 
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.open .modal-window { 
+            transform: scale(1); 
+        }
+        
+        .modal-header { 
+            padding: 1.25rem; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .modal-body { 
+            padding: 1.25rem; 
+            overflow-y: auto; 
+            max-height: 60vh;
+        }
+        
+        .modal-footer { 
+            padding: 1rem 1.25rem; 
+            border-top: 1px solid var(--border); 
+            display: flex; 
+            justify-content: flex-end; 
+        }
+        
+        .user-list-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0.75rem; 
+            background: var(--bg); 
+            border-radius: 6px; 
+            margin-bottom: 0.5rem; 
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* --- Toast --- */
+        .toast-container { 
+            position: fixed; 
+            bottom: 1rem; 
+            right: 1rem; 
+            left: 1rem;
+            z-index: 200; 
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        @media (min-width: 640px) {
+            .toast-container {
+                left: auto;
+                width: auto;
+            }
+        }
+        
+        .toast { 
+            background: #333; 
+            color: white; 
+            padding: 1rem 1.25rem; 
+            border-radius: 8px; 
+            margin-top: 0.5rem; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
+            animation: slideIn 0.3s ease-out; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        @keyframes slideIn { 
+            from { transform: translateX(100%); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
+
+        /* Mobile-specific enhancements */
+        @media (max-width: 480px) {
+            header {
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .brand {
+                font-size: 1rem;
+            }
+            
+            .nav-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.9rem;
+                min-width: 40px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .modal-header h3 {
+                font-size: 1.1rem;
+            }
+            
+            .task-item {
+                padding: 0.875rem;
+            }
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        .scrollable {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Sync buttons */
+        .sync-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Debug panel */
+        .debug-panel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            max-width: 300px;
+            display: none;
+        }
+        
+        .debug-toggle {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            Task Manager Pro
+        </div>
+        <nav>
+            <button class="nav-btn active" onclick="app.navigate('tasks')">Tasks</button>
+            <button class="nav-btn" onclick="app.navigate('dashboard')">Dashboard</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- DAILY TASKS SECTION -->
+        <section id="section-tasks" class="view-section active">
+            <div class="control-panel">
+                <div class="input-group">
+                    <!-- User Selection -->
+                    <div>
+                        <label>Operator:</label>
+                        <select id="user-select" onchange="app.renderTasks()">
+                            <!-- Options populated by JS -->
+                        </select>
+                        <button class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;" onclick="userManager.openModal()">+ Add User</button>
+                    </div>
+
+                    <!-- Date Picker -->
+                    <div>
+                        <label>Date:</label>
+                        <input type="date" id="report-date" onchange="app.renderTasks()">
+                    </div>
+                </div>
+
+                <div class="shift-tabs">
+                    <button class="shift-tab active" onclick="app.setShift('A')">Shift A</button>
+                    <button class="shift-tab" onclick="app.setShift('B')">Shift B</button>
+                    <button class="shift-tab" onclick="app.setShift('C')">Shift C</button>
+                    <button class="shift-tab" onclick="app.setShift('G')">Shift G</button>
+                </div>
+                
+                <!-- Cloud Status -->
+                <div class="cloud-status">
+                    <span class="cloud-indicator" id="cloud-status-indicator"></span>
+                    <span id="cloud-status-text">Checking connection...</span>
+                    <button class="btn btn-sm btn-success" onclick="syncManager.forceSync()" style="margin-left: auto; padding: 0.25rem 0.75rem;">Sync Now</button>
+                </div>
+            </div>
+
+            <div class="task-container">
+                <div class="progress-area">
+                    <div class="progress-label">
+                        <span>Daily Progress</span>
+                        <span id="progress-text">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-bar"></div>
+                    </div>
+                </div>
+
+                <ul class="task-list" id="task-list-ui">
+                    <!-- Tasks injected here -->
+                </ul>
+
+                <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="editor.openModal()">Edit Task List</button>
+                        <button class="btn btn-primary" onclick="app.submitTasks()">Submit Daily Report</button>
+                    </div>
+                    
+                    <!-- Sync Controls -->
+                    <div class="sync-controls">
+                        <button class="btn btn-sm btn-success" onclick="syncManager.saveToCloud()">Save to Cloud</button>
+                        <button class="btn btn-sm btn-warning" onclick="syncManager.loadFromCloud()">Load from Cloud</button>
+                        <button class="btn btn-sm btn-danger" onclick="syncManager.clearLocalData()">Clear Local Data</button>
+                        <button class="btn btn-sm btn-secondary" onclick="syncManager.openModal()">Sync Status</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD SECTION -->
+        <section id="section-dashboard" class="view-section">
+            <div class="dashboard-controls">
+                <div class="control-left-group">
+                    <!-- View Toggles -->
+                    <div class="view-toggles">
+                        <button class="view-btn active" onclick="dashboard.setMode('daily')">Daily</button>
+                        <button class="view-btn" onclick="dashboard.setMode('monthly')">Monthly</button>
+                        <button class="view-btn" onclick="dashboard.setMode('yearly')">Yearly</button>
+                        <button class="view-btn" onclick="dashboard.setMode('custom')">Custom</button>
+                    </div>
+                    
+                    <!-- Custom Date Inputs -->
+                    <div id="custom-range-inputs" class="custom-range-inputs hidden">
+                        <div style="flex: 1;">
+                            <label for="range-start">From</label>
+                            <input type="date" id="range-start" onchange="dashboard.updateCustomView()">
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="range-end">To</label>
+                            <input type="date" id="range-end" onchange="dashboard.updateCustomView()">
+                        </div>
+                    </div>
+
+                    <!-- User Filter -->
+                    <div style="flex: 1;">
+                        <label for="dash-user-select">User:</label>
+                        <select id="dash-user-select" onchange="dashboard.setUserFilter(this.value)">
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Reports in Period</div>
+                    <div class="stat-value" id="stat-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Avg Completion Rate</div>
+                    <div class="stat-value" id="stat-avg">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Performance Chart</div>
+                    <div class="chart-wrapper" id="main-chart">
+                        <!-- Bars injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-title">Activity Log (Selected Period)</div>
+                <div class="scrollable">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th onclick="dashboard.sortBy('reportDate')">Date <span class="sort-icon" id="sort-reportDate">⬍</span></th>
+                                <th onclick="dashboard.sortBy('shift')">Shift <span class="sort-icon" id="sort-shift">⬍</span></th>
+                                <th onclick="dashboard.sortBy('user')">User <span class="sort-icon" id="sort-user">⬍</span></th>
+                                <th onclick="dashboard.sortBy('percentage')">Completion <span class="sort-icon" id="sort-percentage">⬍</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-table-body">
+                            <!-- Logs -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- EDITOR MODAL -->
+    <div class="modal-overlay" id="editor-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Task List Editor (<span id="editor-shift-label"></span>)</h3>
+                <button class="btn btn-secondary btn-sm" onclick="editor.closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;">
+                    <input type="text" id="new-task-input" placeholder="New task description...">
+                    <button class="btn btn-primary" onclick="editor.addTask()">Add Task</button>
+                </div>
+                <div id="editor-list-ui"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="editor.closeModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER MANAGER MODAL -->
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>User Management</h3>
+                <button class="btn btn-secondary btn-sm" onclick="userManager.closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;">
+                    <input type="text" id="new-user-input" placeholder="Enter name...">
+                    <button class="btn btn-primary" onclick="userManager.addUser()">Add User</button>
+                </div>
+                <div id="user-list-ui"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="userManager.closeModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLOUD SYNC MODAL -->
+    <div class="modal-overlay" id="sync-modal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Cloud Sync Status</h3>
+                <button class="btn btn-secondary btn-sm" onclick="syncManager.closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="sync-status-ui">
+                    <!-- Sync status will be shown here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="syncManager.closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-area"></div>
+    
+    <!-- Debug button -->
+    <button class="debug-toggle" onclick="toggleDebug()">?</button>
+    <div class="debug-panel" id="debug-panel"></div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    
+    <script>
+        // ========================
+        // SUPABASE CONFIGURATION
+        // ========================
+        const SUPABASE_URL = 'https://lviiwltmcuypqxlngqpi.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TKKOqT2n1X9ycoQsucar1w_d9ZivbaG';
+        
+        // Create Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Debug logging
+        function debugLog(message, data = null) {
+            const debugPanel = document.getElementById('debug-panel');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<strong>${timestamp}:</strong> ${message}`;
+            if (data) {
+                logEntry.innerHTML += `<pre style="margin: 5px 0; font-size: 10px; overflow: auto;">${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            debugPanel.appendChild(logEntry);
+            debugPanel.scrollTop = debugPanel.scrollHeight;
+            console.log(`[${timestamp}] ${message}`, data || '');
+        }
+        
+        function toggleDebug() {
+            const panel = document.getElementById('debug-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // ========================
+        // LOCAL STORAGE KEYS
+        // ========================
+        const DB_KEY_TASKS = 'tm_tasks';
+        const DB_KEY_LOGS = 'tm_logs';
+        const DB_KEY_USERS = 'tm_users';
+        const DB_KEY_CLOUD_ID = 'tm_cloud_id';
+        const DB_KEY_LAST_SYNC = 'tm_last_sync';
+
+        // ========================
+        // APPLICATION STATE
+        // ========================
+        const state = {
+            currentShift: 'A',
+            tasks: {}, 
+            logs: [],
+            users: [],
+            currentChecks: new Set(),
+            
+            // Cloud state
+            cloudConnected: false,
+            cloudSyncing: false,
+            cloudId: localStorage.getItem(DB_KEY_CLOUD_ID) || null,
+            lastSync: localStorage.getItem(DB_KEY_LAST_SYNC) || null,
+            
+            // Dashboard State
+            dashboardMode: 'daily',
+            dashUserFilter: 'ALL',
+            sortKey: 'reportDate',
+            sortOrder: 'desc'
+        };
+
+        // ========================
+        // UTILITY FUNCTIONS
+        // ========================
+        const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
+        
+        const showToast = (msg, type = 'success') => {
+            const area = document.getElementById('toast-area');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.borderLeft = `4px solid ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--danger)'}`;
+            toast.innerText = msg;
+            area.appendChild(toast);
+            setTimeout(() => { 
+                toast.style.opacity = '0'; 
+                setTimeout(() => toast.remove(), 300); 
+            }, 3000);
+        };
+        
+        const updateCloudStatus = (status) => {
+            const indicator = document.getElementById('cloud-status-indicator');
+            const text = document.getElementById('cloud-status-text');
+            
+            switch(status) {
+                case 'online':
+                    indicator.className = 'cloud-indicator online';
+                    text.textContent = 'Connected to cloud';
+                    state.cloudConnected = true;
+                    break;
+                case 'offline':
+                    indicator.className = 'cloud-indicator offline';
+                    text.textContent = 'Offline - using local storage';
+                    state.cloudConnected = false;
+                    break;
+                case 'syncing':
+                    indicator.className = 'cloud-indicator syncing';
+                    text.textContent = 'Syncing with cloud...';
+                    state.cloudSyncing = true;
+                    break;
+                case 'error':
+                    indicator.className = 'cloud-indicator offline';
+                    text.textContent = 'Cloud sync error';
+                    state.cloudConnected = false;
+                    break;
+            }
+            state.cloudSyncing = status === 'syncing';
+        };
+
+        // ========================
+        // SYNC MANAGER
+        // ========================
+        const syncManager = {
+            // Test connection to Supabase
+            testConnection: async () => {
+                try {
+                    updateCloudStatus('syncing');
+                    debugLog('Testing Supabase connection...');
+                    
+                    // First test if Supabase client is loaded
+                    if (!window.supabase || !supabase) {
+                        throw new Error('Supabase client not loaded');
+                    }
+                    
+                    debugLog('Supabase client loaded, testing connection...');
+                    
+                    // Try a simple query to check connection
+                    const { data, error } = await supabase
+                        .from('task_manager_data')
+                        .select('id')
+                        .limit(1);
+                    
+                    if (error) {
+                        // Check if it's a "table doesn't exist" error
+                        if (error.message.includes('relation') || error.message.includes('does not exist')) {
+                            debugLog('Table does not exist, will create on first save');
+                            updateCloudStatus('online');
+                            return true;
+                        }
+                        throw error;
+                    }
+                    
+                    debugLog('Supabase connection successful', data);
+                    updateCloudStatus('online');
+                    return true;
+                } catch (error) {
+                    console.error('Supabase connection failed:', error);
+                    debugLog('Connection failed:', error.message);
+                    updateCloudStatus('offline');
+                    
+                    // Show user-friendly error
+                    let errorMsg = 'Connection failed';
+                    if (error.message.includes('Failed to fetch')) {
+                        errorMsg = 'Network error - check internet connection';
+                    } else if (error.message.includes('JWT')) {
+                        errorMsg = 'Authentication error - check Supabase credentials';
+                    } else if (error.message.includes('relation')) {
+                        errorMsg = 'Table not found - will create on first save';
+                    }
+                    
+                    showToast(errorMsg, 'error');
+                    return false;
+                }
+            },
+            
+            // Save data to Supabase
+            saveToCloud: async () => {
+                try {
+                    if (!navigator.onLine) {
+                        showToast('No internet connection', 'error');
+                        return null;
+                    }
+                    
+                    updateCloudStatus('syncing');
+                    debugLog('Saving data to cloud...');
+                    
+                    // Prepare data
+                    const cloudData = {
+                        tasks: state.tasks,
+                        logs: state.logs,
+                        users: state.users,
+                        last_updated: new Date().toISOString(),
+                        device_id: navigator.userAgent.substring(0, 100) // Limit length
+                    };
+                    
+                    let result;
+                    
+                    if (state.cloudId) {
+                        // Update existing record
+                        debugLog('Updating existing record:', state.cloudId);
+                        const { data, error } = await supabase
+                            .from('task_manager_data')
+                            .update(cloudData)
+                            .eq('id', state.cloudId)
+                            .select();
+                        
+                        if (error) {
+                            // If record doesn't exist, create new one
+                            if (error.message.includes('No rows found')) {
+                                debugLog('Record not found, creating new one');
+                                const { data: newData, error: newError } = await supabase
+                                    .from('task_manager_data')
+                                    .insert([cloudData])
+                                    .select();
+                                
+                                if (newError) throw newError;
+                                result = newData[0];
+                                state.cloudId = result.id;
+                                localStorage.setItem(DB_KEY_CLOUD_ID, result.id);
+                            } else {
+                                throw error;
+                            }
+                        } else {
+                            result = data[0];
+                        }
+                    } else {
+                        // Create new record
+                        debugLog('Creating new record');
+                        const { data, error } = await supabase
+                            .from('task_manager_data')
+                            .insert([cloudData])
+                            .select();
+                        
+                        if (error) throw error;
+                        result = data[0];
+                        state.cloudId = result.id;
+                        localStorage.setItem(DB_KEY_CLOUD_ID, result.id);
+                    }
+                    
+                    // Update last sync time
+                    state.lastSync = new Date().toISOString();
+                    localStorage.setItem(DB_KEY_LAST_SYNC, state.lastSync);
+                    
+                    updateCloudStatus('online');
+                    showToast('Data saved to cloud successfully!');
+                    debugLog('Save successful:', { id: result.id, last_updated: result.last_updated });
+                    return result;
+                } catch (error) {
+                    console.error('Error saving to cloud:', error);
+                    debugLog('Save failed:', error);
+                    updateCloudStatus('error');
+                    showToast('Failed to save to cloud: ' + error.message, 'error');
+                    return null;
+                }
+            },
+            
+            // Load data from Supabase
+            loadFromCloud: async () => {
+                try {
+                    if (!navigator.onLine) {
+                        showToast('No internet connection', 'error');
+                        return null;
+                    }
+                    
+                    updateCloudStatus('syncing');
+                    debugLog('Loading data from cloud...');
+                    
+                    let query = supabase.from('task_manager_data').select('*');
+                    
+                    if (state.cloudId) {
+                        // Load specific record
+                        debugLog('Loading specific record:', state.cloudId);
+                        query = query.eq('id', state.cloudId);
+                    } else {
+                        // Load most recent record
+                        debugLog('Loading most recent record');
+                        query = query.order('last_updated', { ascending: false }).limit(1);
+                    }
+                    
+                    const { data, error } = await query;
+                    
+                    if (error) throw error;
+                    
+                    if (data && data.length > 0) {
+                        const cloudData = data[0];
+                        debugLog('Data loaded from cloud:', cloudData);
+                        
+                        // Update local state
+                        state.tasks = cloudData.tasks || {};
+                        state.logs = cloudData.logs || [];
+                        state.users = cloudData.users || ["Operator 1", "Manager", "Supervisor"];
+                        state.cloudId = cloudData.id;
+                        state.lastSync = cloudData.last_updated;
+                        
+                        // Save to localStorage as backup
+                        localStorage.setItem(DB_KEY_TASKS, JSON.stringify(state.tasks));
+                        localStorage.setItem(DB_KEY_LOGS, JSON.stringify(state.logs));
+                        localStorage.setItem(DB_KEY_USERS, JSON.stringify(state.users));
+                        localStorage.setItem(DB_KEY_CLOUD_ID, state.cloudId);
+                        localStorage.setItem(DB_KEY_LAST_SYNC, state.lastSync);
+                        
+                        // Update UI
+                        app.renderUserDropdown();
+                        app.renderTasks();
+                        dashboard.render();
+                        
+                        updateCloudStatus('online');
+                        showToast('Data loaded from cloud successfully!');
+                        return cloudData;
+                    } else {
+                        debugLog('No cloud data found');
+                        showToast('No cloud data found', 'warning');
+                        updateCloudStatus('online');
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('Error loading from cloud:', error);
+                    debugLog('Load failed:', error);
+                    updateCloudStatus('error');
+                    showToast('Failed to load from cloud: ' + error.message, 'error');
+                    return null;
+                }
+            },
+            
+            // Force sync (save then load)
+            forceSync: async () => {
+                debugLog('Force sync started');
+                await syncManager.saveToCloud();
+                await syncManager.loadFromCloud();
+            },
+            
+            // Clear local data (keeps cloud data)
+            clearLocalData: () => {
+                if (confirm('Clear all local data? This will not affect cloud data.')) {
+                    localStorage.removeItem(DB_KEY_TASKS);
+                    localStorage.removeItem(DB_KEY_LOGS);
+                    localStorage.removeItem(DB_KEY_USERS);
+                    
+                    state.tasks = {};
+                    state.logs = [];
+                    state.currentChecks.clear();
+                    
+                    app.seedDefaults();
+                    app.renderUserDropdown();
+                    app.renderTasks();
+                    
+                    showToast('Local data cleared');
+                }
+            },
+            
+            // Open sync modal
+            openModal: () => {
+                const modal = document.getElementById('sync-modal');
+                const statusUI = document.getElementById('sync-status-ui');
+                
+                statusUI.innerHTML = `
+                    <div style="margin-bottom: 1rem;">
+                        <h4>Cloud Sync Status</h4>
+                        <p><strong>Connection:</strong> ${state.cloudConnected ? '✅ Online' : '❌ Offline'}</p>
+                        <p><strong>Cloud ID:</strong> ${state.cloudId || 'Not set'}</p>
+                        <p><strong>Last Sync:</strong> ${state.lastSync ? new Date(state.lastSync).toLocaleString() : 'Never'}</p>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <h4>Local Storage</h4>
+                        <p><strong>Tasks:</strong> ${Object.keys(state.tasks).length} shifts</p>
+                        <p><strong>Logs:</strong> ${state.logs.length} records</p>
+                        <p><strong>Users:</strong> ${state.users.length} users</p>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="syncManager.forceSync()">Force Sync</button>
+                        <button class="btn btn-warning" onclick="syncManager.saveToCloud()">Save to Cloud</button>
+                        <button class="btn btn-primary" onclick="syncManager.loadFromCloud()">Load from Cloud</button>
+                    </div>
+                `;
+                
+                modal.classList.add('open');
+            },
+            
+            // Close sync modal
+            closeModal: () => {
+                document.getElementById('sync-modal').classList.remove('open');
+            }
+        };
+
+        // ========================
+        // LOCAL STORAGE MANAGEMENT
+        // ========================
+        const saveState = async (autoSync = true) => {
+            // Save to localStorage
+            localStorage.setItem(DB_KEY_TASKS, JSON.stringify(state.tasks));
+            localStorage.setItem(DB_KEY_LOGS, JSON.stringify(state.logs));
+            localStorage.setItem(DB_KEY_USERS, JSON.stringify(state.users));
+            
+            // Auto-sync to cloud if enabled and connected
+            if (autoSync && state.cloudConnected && !state.cloudSyncing && navigator.onLine) {
+                try {
+                    await syncManager.saveToCloud();
+                } catch (error) {
+                    debugLog('Auto-sync failed, data saved locally');
+                }
+            }
+        };
+
+        // ========================
+        // MAIN APPLICATION LOGIC
+        // ========================
+        const app = {
+            init: async () => {
+                debugLog('Application initializing...');
+                
+                // Load from localStorage first for instant UI
+                app.loadFromLocalStorage();
+                
+                // Set up UI immediately
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('report-date').value = today;
+                document.getElementById('range-start').value = today;
+                document.getElementById('range-end').value = today;
+                
+                app.renderUserDropdown();
+                app.renderTasks();
+                dashboard.render();
+                
+                // Test cloud connection in background
+                setTimeout(async () => {
+                    debugLog('Testing cloud connection...');
+                    const connected = await syncManager.testConnection();
+                    if (connected) {
+                        // Try to load from cloud if connected
+                        await syncManager.loadFromCloud();
+                        showToast('Cloud sync enabled', 'success');
+                    }
+                }, 500);
+                
+                // Set up auto-save on unload
+                window.addEventListener('beforeunload', () => {
+                    saveState(true);
+                });
+                
+                // Set up periodic sync (every 5 minutes)
+                setInterval(() => {
+                    if (state.cloudConnected && !state.cloudSyncing && navigator.onLine) {
+                        debugLog('Periodic sync triggered');
+                        syncManager.saveToCloud();
+                    }
+                }, 5 * 60 * 1000);
+                
+                // Listen for online/offline events
+                window.addEventListener('online', () => {
+                    showToast('Back online - syncing...', 'success');
+                    syncManager.testConnection();
+                });
+                
+                window.addEventListener('offline', () => {
+                    showToast('You are offline', 'warning');
+                    updateCloudStatus('offline');
+                });
+                
+                debugLog('Application initialized');
+            },
+            
+            loadFromLocalStorage: () => {
+                debugLog('Loading from local storage...');
+                
+                if(localStorage.getItem(DB_KEY_TASKS)) {
+                    state.tasks = JSON.parse(localStorage.getItem(DB_KEY_TASKS));
+                    debugLog('Tasks loaded from local storage:', Object.keys(state.tasks).length + ' shifts');
+                } else {
+                    debugLog('No tasks in local storage, seeding defaults');
+                    app.seedDefaults();
+                }
+
+                if(localStorage.getItem(DB_KEY_LOGS)) {
+                    state.logs = JSON.parse(localStorage.getItem(DB_KEY_LOGS));
+                    debugLog('Logs loaded from local storage:', state.logs.length + ' records');
+                }
+
+                if(localStorage.getItem(DB_KEY_USERS)) {
+                    state.users = JSON.parse(localStorage.getItem(DB_KEY_USERS));
+                    debugLog('Users loaded from local storage:', state.users.length + ' users');
+                } else {
+                    state.users = ["Operator 1", "Manager", "Supervisor"];
+                    saveState(false);
+                }
+            },
+
+            seedDefaults: () => {
+                debugLog('Seeding default tasks');
+                ['A', 'B', 'C', 'G'].forEach(shift => {
+                    state.tasks[shift] = [
+                        {id: generateId(), text: 'Check Machine Status', active: true},
+                        {id: generateId(), text: 'Clean Work Area', active: true},
+                        {id: generateId(), text: 'Log Production Data', active: true}
+                    ];
+                });
+                saveState(false);
+            },
+
+            renderUserDropdown: () => {
+                const select = document.getElementById('user-select');
+                select.innerHTML = '<option value="" disabled selected>Select User...</option>';
+                state.users.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u;
+                    opt.innerText = u;
+                    select.appendChild(opt);
+                });
+            },
+
+            navigate: (view) => {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                document.getElementById(`section-${view}`).classList.add('active');
+                
+                document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
+                    btn.classList.toggle('active', (view === 'tasks' && idx === 0) || (view === 'dashboard' && idx === 1));
+                });
+
+                if(view === 'dashboard') dashboard.render();
+            },
+
+            setShift: (shift) => {
+                state.currentShift = shift;
+                state.currentChecks.clear();
+                
+                document.querySelectorAll('.shift-tab').forEach(btn => {
+                    btn.classList.toggle('active', btn.innerText.includes(shift));
+                });
+                app.renderTasks();
+            },
+
+            renderTasks: () => {
+                const listEl = document.getElementById('task-list-ui');
+                listEl.innerHTML = '';
+                
+                // 1. Get Context
+                const user = document.getElementById('user-select').value;
+                const date = document.getElementById('report-date').value;
+                const shift = state.currentShift;
+                const tasks = state.tasks[shift] || [];
+                let activeCount = 0;
+
+                // 2. Check for Previous Submission
+                let previousLog = null;
+                if (user && date) {
+                    const matchingLogs = state.logs.filter(l => 
+                        l.user === user && 
+                        l.reportDate === date && 
+                        l.shift === shift
+                    );
+                    
+                    if (matchingLogs.length > 0) {
+                        matchingLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                        previousLog = matchingLogs[0];
+                    }
+                }
+
+                // 3. Restore State
+                state.currentChecks.clear();
+                if (previousLog && previousLog.checkedTaskIds) {
+                    previousLog.checkedTaskIds.forEach(id => state.currentChecks.add(id));
+                }
+
+                // 4. Render UI
+                tasks.forEach(t => {
+                    if(!t.active) return;
+                    activeCount++;
+                    const isChecked = state.currentChecks.has(t.id);
+                    
+                    const li = document.createElement('li');
+                    li.className = `task-item ${isChecked ? 'checked' : 'unchecked'}`;
+                    
+                    li.innerHTML = `
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="app.toggleCheck('${t.id}', this)">
+                        <span class="task-text">${t.text}</span>
+                    `;
+                    listEl.appendChild(li);
+                });
+
+                if(activeCount === 0) listEl.innerHTML = '<div style="padding:1rem; color:var(--secondary);">No active tasks.</div>';
+                app.updateProgress(activeCount);
+            },
+
+            toggleCheck: (id, box) => {
+                const li = box.closest('.task-item');
+                if(box.checked) { 
+                    state.currentChecks.add(id); 
+                    if(li) {
+                        li.classList.remove('unchecked');
+                        li.classList.add('checked'); 
+                    }
+                } else { 
+                    state.currentChecks.delete(id); 
+                    if(li) {
+                        li.classList.remove('checked');
+                        li.classList.add('unchecked'); 
+                    }
+                }
+                
+                const totalActive = state.tasks[state.currentShift].filter(t => t.active).length;
+                app.updateProgress(totalActive);
+                
+                // Auto-save progress
+                saveState(true);
+            },
+
+            updateProgress: (total) => {
+                const pct = total === 0 ? 0 : Math.round((state.currentChecks.size / total) * 100);
+                document.getElementById('progress-bar').style.width = `${pct}%`;
+                document.getElementById('progress-text').innerText = `${pct}%`;
+            },
+
+            submitTasks: async () => {
+                const user = document.getElementById('user-select').value;
+                const date = document.getElementById('report-date').value;
+                
+                if(!user) { showToast('Please select a user', 'error'); return; }
+                if(!date) { showToast('Please select a date', 'error'); return; }
+
+                const tasks = state.tasks[state.currentShift].filter(t => t.active);
+                if(tasks.length === 0) { showToast('No active tasks to submit', 'error'); return; }
+
+                const record = {
+                    id: generateId(),
+                    timestamp: new Date().toISOString(),
+                    reportDate: date, 
+                    shift: state.currentShift,
+                    user: user,
+                    total: tasks.length,
+                    completed: state.currentChecks.size,
+                    percentage: Math.round((state.currentChecks.size / tasks.length) * 100),
+                    checkedTaskIds: Array.from(state.currentChecks)
+                };
+
+                state.logs.unshift(record);
+                await saveState(true);
+                showToast(`Report for ${date} submitted!`);
+                
+                // Clear current checks after submission
+                state.currentChecks.clear();
+                app.renderTasks();
+            }
+        };
+
+        // ========================
+        // EDITOR LOGIC
+        // ========================
+        const editor = {
+            openModal: () => {
+                document.getElementById('editor-modal').classList.add('open');
+                document.getElementById('editor-shift-label').innerText = 'Shift ' + state.currentShift;
+                editor.renderList();
+            },
+            closeModal: () => {
+                document.getElementById('editor-modal').classList.remove('open');
+                app.renderTasks();
+            },
+            renderList: () => {
+                const list = document.getElementById('editor-list-ui');
+                list.innerHTML = '';
+                state.tasks[state.currentShift].forEach((t, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'user-list-item';
+                    div.innerHTML = `
+                        <span contenteditable="true" style="flex:1; padding:4px;" onblur="editor.updateText('${t.id}', this)">${t.text}</span>
+                        <button class="btn ${t.active ? 'btn-secondary' : 'btn-danger'} btn-sm" onclick="editor.toggleActive('${t.id}')">${t.active ? 'Active' : 'Inactive'}</button>
+                        <button class="btn btn-danger btn-sm" onclick="editor.delete('${t.id}')">Del</button>
+                    `;
+                    list.appendChild(div);
+                });
+            },
+            addTask: () => {
+                const val = document.getElementById('new-task-input').value.trim();
+                if(!val) return;
+                state.tasks[state.currentShift].push({ id: generateId(), text: val, active: true });
+                document.getElementById('new-task-input').value = '';
+                saveState(true); 
+                editor.renderList();
+            },
+            updateText: (id, el) => {
+                const t = state.tasks[state.currentShift].find(x => x.id === id);
+                if(t) { t.text = el.innerText; saveState(true); }
+            },
+            toggleActive: (id) => {
+                const t = state.tasks[state.currentShift].find(x => x.id === id);
+                if(t) { t.active = !t.active; saveState(true); editor.renderList(); }
+            },
+            delete: (id) => {
+                state.tasks[state.currentShift] = state.tasks[state.currentShift].filter(x => x.id !== id);
+                saveState(true); 
+                editor.renderList();
+            }
+        };
+
+        // ========================
+        // USER MANAGER LOGIC
+        // ========================
+        const userManager = {
+            openModal: () => {
+                document.getElementById('user-modal').classList.add('open');
+                userManager.renderList();
+            },
+            closeModal: () => {
+                document.getElementById('user-modal').classList.remove('open');
+                app.renderUserDropdown();
+                dashboard.renderUserDropdown();
+            },
+            renderList: () => {
+                const list = document.getElementById('user-list-ui');
+                list.innerHTML = '';
+                state.users.forEach((u, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'user-list-item';
+                    div.innerHTML = `
+                        <span>${u}</span>
+                        <button class="btn btn-danger btn-sm" onclick="userManager.delete(${i})">Remove</button>
+                    `;
+                    list.appendChild(div);
+                });
+            },
+            addUser: () => {
+                const val = document.getElementById('new-user-input').value.trim();
+                if(!val) return;
+                if(state.users.includes(val)) { showToast('User already exists', 'error'); return; }
+                state.users.push(val);
+                document.getElementById('new-user-input').value = '';
+                saveState(true); 
+                userManager.renderList();
+            },
+            delete: (idx) => {
+                state.users.splice(idx, 1);
+                saveState(true); 
+                userManager.renderList();
+            }
+        };
+
+        // ========================
+        // DASHBOARD LOGIC
+        // ========================
+        const dashboard = {
+            setMode: (mode) => {
+                state.dashboardMode = mode;
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.innerText.toLowerCase() === mode || (mode === 'custom' && btn.innerText === 'Custom'));
+                });
+                
+                const rangeInputs = document.getElementById('custom-range-inputs');
+                if(mode === 'custom') rangeInputs.classList.remove('hidden');
+                else rangeInputs.classList.add('hidden');
+
+                dashboard.render();
+            },
+
+            setUserFilter: (val) => {
+                state.dashUserFilter = val;
+                dashboard.render();
+            },
+
+            sortBy: (key) => {
+                if (state.sortKey === key) {
+                    state.sortOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
+                } else {
+                    state.sortKey = key;
+                    state.sortOrder = 'desc';
+                }
+                dashboard.render();
+            },
+
+            getProcessedLogs: () => {
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                
+                let logs = state.logs.filter(log => {
+                    const d = new Date(log.reportDate);
+                    const dStr = log.reportDate;
+
+                    if (state.dashboardMode === 'daily') return dStr === todayStr;
+                    else if (state.dashboardMode === 'monthly') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                    else if (state.dashboardMode === 'yearly') return d.getFullYear() === now.getFullYear();
+                    else if (state.dashboardMode === 'custom') {
+                        const start = document.getElementById('range-start').value;
+                        const end = document.getElementById('range-end').value;
+                        return dStr >= start && dStr <= end;
+                    }
+                    return true;
+                });
+
+                if (state.dashUserFilter !== 'ALL') {
+                    logs = logs.filter(l => l.user === state.dashUserFilter);
+                }
+
+                return logs;
+            },
+
+            updateCustomView: () => {
+                if(state.dashboardMode === 'custom') dashboard.render();
+            },
+            
+            renderUserDropdown: () => {
+                const userSelect = document.getElementById('dash-user-select');
+                userSelect.innerHTML = '';
+                const allOpt = document.createElement('option');
+                allOpt.value = 'ALL';
+                allOpt.innerText = 'ALL Users';
+                userSelect.appendChild(allOpt);
+                
+                state.users.forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u;
+                    opt.innerText = u;
+                    userSelect.appendChild(opt);
+                });
+                userSelect.value = state.dashUserFilter;
+            },
+
+            render: () => {
+                // Update user dropdown if needed
+                const userSelect = document.getElementById('dash-user-select');
+                if (userSelect.options.length !== state.users.length + 1) {
+                    dashboard.renderUserDropdown();
+                }
+
+                let logs = dashboard.getProcessedLogs();
+                
+                document.getElementById('stat-total').innerText = logs.length;
+                const avg = logs.length ? Math.round(logs.reduce((a,b)=>a+b.percentage, 0)/logs.length) : 0;
+                document.getElementById('stat-avg').innerText = avg + '%';
+
+                const chartData = [];
+                
+                if (state.dashboardMode === 'daily') {
+                    const shifts = {A:[], B:[], C:[], G:[]};
+                    logs.forEach(l => { if(shifts[l.shift]) shifts[l.shift].push(l.percentage); });
+                    Object.keys(shifts).forEach(s => {
+                        const arr = shifts[s];
+                        const val = arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
+                        chartData.push({ label: 'Shift '+s, value: val });
+                    });
+                } 
+                else if (state.dashboardMode === 'monthly') {
+                    const days = {}; 
+                    logs.forEach(l => {
+                        const day = new Date(l.reportDate).getDate();
+                        if(!days[day]) days[day] = [];
+                        days[day].push(l.percentage);
+                    });
+                    Object.keys(days).sort((a,b)=>a-b).forEach(d => {
+                        const val = days[d].length ? Math.round(days[d].reduce((a,b)=>a+b,0)/days[d].length) : 0;
+                        chartData.push({ label: d+'th', value: val });
+                    });
+                }
+                else if (state.dashboardMode === 'yearly') {
+                    const months = Array(12).fill(0).map(()=>[]); 
+                    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    logs.forEach(l => {
+                        const m = new Date(l.reportDate).getMonth();
+                        months[m].push(l.percentage);
+                    });
+                    months.forEach((mData, idx) => {
+                        if(mData.length) {
+                            const val = Math.round(mData.reduce((a,b)=>a+b,0)/mData.length);
+                            chartData.push({ label: monthNames[idx], value: val });
+                        } else {
+                            chartData.push({ label: monthNames[idx], value: 0 });
+                        }
+                    });
+                }
+                else if (state.dashboardMode === 'custom') {
+                    const dateMap = {};
+                    logs.forEach(l => {
+                        if(!dateMap[l.reportDate]) dateMap[l.reportDate] = [];
+                        dateMap[l.reportDate].push(l.percentage);
+                    });
+                    Object.keys(dateMap).sort().forEach(d => {
+                        const val = dateMap[d].length ? Math.round(dateMap[d].reduce((a,b)=>a+b,0)/dateMap[d].length) : 0;
+                        chartData.push({ label: d.substring(5), value: val });
+                    });
+                }
+
+                const chartEl = document.getElementById('main-chart');
+                chartEl.innerHTML = '';
+                if(chartData.length === 0) {
+                    chartEl.innerHTML = '<div style="color:var(--secondary); margin:auto;">No data for this period</div>';
+                } else {
+                    const maxVal = Math.max(...chartData.map(d => d.value)) || 100;
+                    chartData.forEach(d => {
+                        const height = (d.value / maxVal) * 100;
+                        const group = document.createElement('div');
+                        group.className = 'bar-group';
+                        group.innerHTML = `
+                            <div class="bar" style="height: ${height}%;" data-val="${d.value}%"></div>
+                            <div class="bar-label">${d.label}</div>
+                        `;
+                        chartEl.appendChild(group);
+                    });
+                }
+
+                let tableLogs = [...logs];
+                tableLogs.sort((a, b) => {
+                    let valA = a[state.sortKey];
+                    let valB = b[state.sortKey];
+                    if (state.sortKey === 'reportDate') {
+                        valA = new Date(valA);
+                        valB = new Date(valB);
+                    }
+                    if (valA < valB) return state.sortOrder === 'asc' ? -1 : 1;
+                    if (valA > valB) return state.sortOrder === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                ['reportDate', 'shift', 'user', 'percentage'].forEach(k => {
+                    const icon = document.getElementById(`sort-${k}`);
+                    if(state.sortKey === k) {
+                        icon.innerText = state.sortOrder === 'asc' ? '▲' : '▼';
+                        icon.style.color = 'var(--primary)';
+                    } else {
+                        icon.innerText = '⬍';
+                        icon.style.color = 'var(--secondary)';
+                    }
+                });
+
+                const tbody = document.getElementById('log-table-body');
+                tbody.innerHTML = '';
+                tableLogs.slice(0, 20).forEach(l => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${l.reportDate}</td>
+                        <td><span style="font-weight:bold">${l.shift}</span></td>
+                        <td>${l.user}</td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div style="flex:1; height:6px; background:#e2e8f0; border-radius:3px; width:60px;">
+                                    <div style="width:${l.percentage}%; height:100%; background:var(--success); border-radius:3px;"></div>
+                                </div>
+                                ${l.percentage}%
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        };
+
+        // ========================
+        // INITIALIZE APPLICATION
+        // ========================
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>

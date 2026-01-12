@@ -1,0 +1,5 @@
+1.0.0 = file okay.
+1.0.1 = authentication enabled  * missing dashboard, added home screen but named as dashboard.
+1.1.0 = database connection restored.
+1.1.1 = new user create / user management appeared
+1.1.2 = nav bar Dasboard renamed to Home. 

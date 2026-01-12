@@ -1,0 +1,18 @@
+<section id="section-home" class="view-section active">
+    <div class="control-panel">
+        <h2 style="margin: 0 0 1rem 0;">Welcome, <span id="welcome-name">User</span></h2>
+        <p style="color: var(--secondary); margin: 0;">Select a responsibility to manage</p>
+        
+        <!-- User Filter for Home Section -->
+        <div class="input-group">
+            <label>Filter by User:</label>
+            <select id="home-user-select" onchange="home.setUserFilter(this.value)">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+    </div>
+    
+    <div class="home-cards" id="home-cards">
+        <!-- Cards will be populated based on user responsibilities -->
+    </div>
+</section>

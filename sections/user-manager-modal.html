@@ -1,0 +1,19 @@
+<!-- USER MANAGER MODAL (Existing) -->
+<div class="modal-overlay" id="user-modal">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h3>User Management</h3>
+            <button class="btn btn-secondary btn-sm" onclick="userManager.closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;">
+                <input type="text" id="new-user-input" placeholder="Enter name...">
+                <button class="btn btn-primary" onclick="userManager.addUser()">Add User</button>
+            </div>
+            <div id="user-list-ui"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="userManager.closeModal()">Done</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,76 @@
+<!-- CREATE USER MODAL -->
+<div class="modal-overlay" id="create-user-modal">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h3>Create New User</h3>
+            <button class="btn btn-secondary btn-sm" onclick="userManagement.closeCreateModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="user-form-grid">
+                <div class="form-group">
+                    <label for="new-user-id">User ID *</label>
+                    <input type="text" id="new-user-id" placeholder="e.g., 5638" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-name">Full Name *</label>
+                    <input type="text" id="new-user-name" placeholder="e.g., Ripon Sarkar" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-designation">Designation *</label>
+                    <input type="text" id="new-user-designation" placeholder="e.g., Assistant Engineer" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-department">Department *</label>
+                    <select id="new-user-department" required>
+                        <option value="">Select Department</option>
+                        <option value="Production">Production</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Quality">Quality</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="HR">HR</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-phone">Phone Number</label>
+                    <input type="tel" id="new-user-phone" placeholder="+8801XXXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="new-user-email">Email</label>
+                    <input type="email" id="new-user-email" placeholder="user@company.com">
+                </div>
+                <div class="form-group">
+                    <label for="new-user-role">Role *</label>
+                    <select id="new-user-role" required onchange="userManagement.onRoleChange()">
+                        <option value="">Select Role</option>
+                        <option value="Administrator">Administrator</option>
+                        <option value="Shift Officer">Shift Officer</option>
+                        <option value="Manager">Manager</option>
+                        <option value="GM">GM</option>
+                        <option value="Worker">Worker</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-password">Initial Password *</label>
+                    <input type="password" id="new-user-password" placeholder="Set initial password" required>
+                </div>
+            </div>
+            
+            <h4 style="margin: 1.5rem 0 1rem 0;">Responsibilities</h4>
+            <div class="responsibilities-grid" id="responsibilities-grid">
+                <!-- Responsibilities will be populated here -->
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="new-user-active" checked>
+                    Active User (Can login)
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="userManagement.closeCreateModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="userManagement.createUser()">Create User</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+<!-- EDITOR MODAL (Existing) -->
+<div class="modal-overlay" id="editor-modal">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h3>Task List Editor (<span id="editor-shift-label"></span>)</h3>
+            <button class="btn btn-secondary btn-sm" onclick="editor.closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 1rem;">
+                <input type="text" id="new-task-input" placeholder="New task description...">
+                <button class="btn btn-primary" onclick="editor.addTask()">Add Task</button>
+            </div>
+            <div id="editor-list-ui"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="editor.closeModal()">Done</button>
+        </div>
+    </div>
+</div>

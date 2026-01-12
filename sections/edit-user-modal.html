@@ -1,0 +1,72 @@
+<!-- EDIT USER MODAL -->
+<div class="modal-overlay" id="edit-user-modal">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h3>Edit User</h3>
+            <button class="btn btn-secondary btn-sm" onclick="userManagement.closeEditModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="user-form-grid">
+                <div class="form-group">
+                    <label for="edit-user-id">User ID *</label>
+                    <input type="text" id="edit-user-id" placeholder="e.g., 5638" required disabled>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-name">Full Name *</label>
+                    <input type="text" id="edit-user-name" placeholder="e.g., Ripon Sarkar" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-designation">Designation *</label>
+                    <input type="text" id="edit-user-designation" placeholder="e.g., Assistant Engineer" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-department">Department *</label>
+                    <select id="edit-user-department" required>
+                        <option value="">Select Department</option>
+                        <option value="Production">Production</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Quality">Quality</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="HR">HR</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-phone">Phone Number</label>
+                    <input type="tel" id="edit-user-phone" placeholder="+8801XXXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-email">Email</label>
+                    <input type="email" id="edit-user-email" placeholder="user@company.com">
+                </div>
+                <div class="form-group">
+                    <label for="edit-user-role">Role *</label>
+                    <select id="edit-user-role" required onchange="userManagement.onEditRoleChange()">
+                        <option value="">Select Role</option>
+                        <option value="Administrator">Administrator</option>
+                        <option value="Shift Officer">Shift Officer</option>
+                        <option value="Manager">Manager</option>
+                        <option value="GM">GM</option>
+                        <option value="Worker">Worker</option>
+                    </select>
+                </div>
+            </div>
+            
+            <h4 style="margin: 1.5rem 0 1rem 0;">Responsibilities</h4>
+            <div class="responsibilities-grid" id="edit-responsibilities-grid">
+                <!-- Responsibilities will be populated here -->
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="edit-user-active">
+                    Active User (Can login)
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="userManagement.closeEditModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="userManagement.updateUser()">Update User</button>
+        </div>
+    </div>
+</div>

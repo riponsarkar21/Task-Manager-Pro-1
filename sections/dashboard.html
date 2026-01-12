@@ -1,0 +1,70 @@
+<!-- DASHBOARD SECTION -->
+<section id="section-dashboard" class="view-section">
+    <div class="dashboard-controls">
+        <div class="control-left-group">
+            <!-- View Toggles -->
+            <div class="view-toggles">
+                <button class="view-btn active" onclick="dashboard.setMode('daily')">Daily</button>
+                <button class="view-btn" onclick="dashboard.setMode('monthly')">Monthly</button>
+                <button class="view-btn" onclick="dashboard.setMode('yearly')">Yearly</button>
+                <button class="view-btn" onclick="dashboard.setMode('custom')">Custom</button>
+            </div>
+            
+            <!-- Custom Date Inputs -->
+            <div id="custom-range-inputs" class="custom-range-inputs hidden">
+                <div style="flex: 1;">
+                    <label for="range-start">From</label>
+                    <input type="date" id="range-start" onchange="dashboard.updateCustomView()">
+                </div>
+                <div style="flex: 1;">
+                    <label for="range-end">To</label>
+                    <input type="date" id="range-end" onchange="dashboard.updateCustomView()">
+                </div>
+            </div>
+
+            <!-- User Filter -->
+            <div style="flex: 1;">
+                <label for="dash-user-select">User:</label>
+                <select id="dash-user-select" onchange="dashboard.setUserFilter(this.value)">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="stat-card">
+            <div class="stat-title">Reports in Period</div>
+            <div class="stat-value" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Avg Completion Rate</div>
+            <div class="stat-value" id="stat-avg">0%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Performance Chart</div>
+            <div class="chart-wrapper" id="main-chart">
+                <!-- Bars injected here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Activity Log (Selected Period)</div>
+        <div class="scrollable">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th onclick="dashboard.sortBy('reportDate')">Date <span class="sort-icon" id="sort-reportDate">⬍</span></th>
+                        <th onclick="dashboard.sortBy('shift')">Shift <span class="sort-icon" id="sort-shift">⬍</span></th>
+                        <th onclick="dashboard.sortBy('user')">User <span class="sort-icon" id="sort-user">⬍</span></th>
+                        <th onclick="dashboard.sortBy('percentage')">Completion <span class="sort-icon" id="sort-percentage">⬍</span></th>
+                    </tr>
+                </thead>
+                <tbody id="log-table-body">
+                    <!-- Logs -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
